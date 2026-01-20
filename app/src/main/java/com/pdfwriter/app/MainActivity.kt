@@ -153,6 +153,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        binding.btnColorPicker.setOnClickListener {
+            showColorPickerDialog()
+        }
+
         binding.btnMenu.setOnClickListener { view ->
             showMenu(view)
         }
@@ -165,6 +169,7 @@ class MainActivity : AppCompatActivity() {
         highlightActiveMode()
         updateScrollModeButton()
         updateUndoRedoButtons()
+        updateColorButton()
     }
 
     private fun updateUndoRedoButtons() {
@@ -237,6 +242,43 @@ class MainActivity : AppCompatActivity() {
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
+    }
+
+    private fun showColorPickerDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_color_picker, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+        
+        val colors = mapOf(
+            R.id.colorBlack to Color.BLACK,
+            R.id.colorRed to Color.RED,
+            R.id.colorBlue to Color.BLUE,
+            R.id.colorGreen to Color.GREEN,
+            R.id.colorYellow to Color.YELLOW,
+            R.id.colorOrange to Color.parseColor("#FF9800"),
+            R.id.colorPurple to Color.parseColor("#9C27B0"),
+            R.id.colorPink to Color.parseColor("#E91E63"),
+            R.id.colorBrown to Color.parseColor("#795548"),
+            R.id.colorGray to Color.GRAY,
+            R.id.colorCyan to Color.CYAN,
+            R.id.colorWhite to Color.WHITE
+        )
+        
+        colors.forEach { (viewId, color) ->
+            dialogView.findViewById<View>(viewId)?.setOnClickListener {
+                binding.drawingView.penColor = color
+                updateColorButton()
+                dialog.dismiss()
+            }
+        }
+        
+        dialog.show()
+    }
+
+    private fun updateColorButton() {
+        // Zeige aktuelle Farbe auf dem Button durch Hintergrundfarbe
+        binding.btnColorPicker.setBackgroundColor(binding.drawingView.penColor)
     }
 
     private fun saveCurrentPageDrawings() {
