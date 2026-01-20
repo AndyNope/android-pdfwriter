@@ -77,9 +77,7 @@ class MainActivity : AppCompatActivity() {
         
         // Re-rendere die aktuelle Seite mit neuer Ausrichtung
         currentPdfUri?.let {
-            renderPage(currentPageIndex)
-            // Lade Zeichnungen nach dem Re-render wieder
-            loadPageDrawings()
+            renderPage(currentPageIndex, restoreDrawings = true)
         }
     }
 
@@ -315,7 +313,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun renderPage(pageIndex: Int) {
+    private fun renderPage(pageIndex: Int, restoreDrawings: Boolean = false) {
         pdfRenderer?.let { renderer ->
             if (pageIndex < 0 || pageIndex >= renderer.pageCount) return
             
@@ -367,6 +365,13 @@ class MainActivity : AppCompatActivity() {
                         val containerParams = binding.pdfContainer.layoutParams
                         containerParams.height = actualHeight
                         binding.pdfContainer.layoutParams = containerParams
+                        
+                        // Lade Zeichnungen nach dem Layout-Update
+                        if (restoreDrawings) {
+                            binding.drawingView.post {
+                                loadPageDrawings()
+                            }
+                        }
                     }
                 }
                 
