@@ -70,30 +70,16 @@ class MainActivity : AppCompatActivity() {
         closePdfRenderer()
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        // Speichere aktuellen Zustand
-        currentPdfUri?.let { uri ->
-            outState.putString("pdf_uri", uri.toString())
-            outState.putInt("current_page", currentPageIndex)
-            saveCurrentPageDrawings()
-            // Speichere Zeichnungen
-            outState.putInt("drawings_size", pageDrawings.size)
-            pageDrawings.forEach { (pageIdx, paths) ->
-                outState.putInt("drawing_page_$pageIdx", pageIdx)
-                outState.putInt("drawing_count_$pageIdx", paths.size)
-            }
-        }
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        // Stelle Zustand wieder her
-        savedInstanceState.getString("pdf_uri")?.let { uriString ->
-            val uri = Uri.parse(uriString)
-            val savedPage = savedInstanceState.getInt("current_page", 0)
-            currentPageIndex = savedPage
-            loadPdf(uri)
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+        // Speichere aktuelle Zeichnungen vor dem Re-render
+        saveCurrentPageDrawings()
+        
+        // Re-rendere die aktuelle Seite mit neuer Ausrichtung
+        currentPdfUri?.let {
+            renderPage(currentPageIndex)
+            // Lade Zeichnungen nach dem Re-render wieder
+            loadPageDrawings()
         }
     }
 
