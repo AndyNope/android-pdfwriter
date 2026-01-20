@@ -5,25 +5,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
-        android:id="@+id/pdfContainer"
+    <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:fillViewport="true"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
-        
-        <com.github.barteksc.pdfviewer.PDFView
-            android:id="@+id/pdfView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
 
-        <com.pdfwriter.app.DrawingView
-            android:id="@+id/drawingView"
+        <FrameLayout
+            android:id="@+id/pdfContainer"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-    </FrameLayout>
+            android:layout_height="wrap_content">
+            
+            <ImageView
+                android:id="@+id/pdfImageView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:scaleType="fitStart"
+                android:contentDescription="@string/app_name"/>
+
+            <com.pdfwriter.app.DrawingView
+                android:id="@+id/drawingView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </FrameLayout>
+    </ScrollView>
 
     <LinearLayout
         android:id="@+id/toolbar"
@@ -31,40 +41,72 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="8dp"
-        android:gravity="center"
+        android:gravity="center_vertical"
         android:background="?attr/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
         <Button
-            android:id="@+id/btnOpenPdf"
+            android:id="@+id/btnPrevPage"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="4dp"
+            android:text="◄"/>
+
+        <TextView
+            android:id="@+id/tvPageInfo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"
-            android:text="@string/open_pdf"/>
+            android:layout_margin="8dp"
+            android:text="1/1"
+            android:textColor="@color/white"
+            android:textSize="16sp"/>
 
         <Button
-            android:id="@+id/btnSavePdf"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/btnNextPage"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_margin="4dp"
-            android:text="@string/save_pdf"/>
+            android:text="►"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"/>
 
         <Button
-            android:id="@+id/btnClear"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/btnPenMode"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_margin="4dp"
-            android:text="@string/clear_drawing"/>
+            android:text="✎"
+            android:textSize="20sp"/>
 
-        <SeekBar
-            android:id="@+id/seekBarPenSize"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
+        <Button
+            android:id="@+id/btnEraserMode"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_margin="4dp"
-            android:max="50"
-            android:progress="5"/>
+            android:text="⌫"
+            android:textSize="20sp"/>
+
+        <Button
+            android:id="@+id/btnScrollMode"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="4dp"
+            android:text="⇅"
+            android:textSize="20sp"
+            android:alpha="0.5"/>
+
+        <Button
+            android:id="@+id/btnMenu"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="4dp"
+            android:text="⋮"
+            android:textSize="24sp"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

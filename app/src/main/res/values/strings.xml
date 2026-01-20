@@ -9,4 +9,11 @@
     <string name="saved_successfully">PDF erfolgreich gespeichert</string>
     <string name="save_failed">Speichern fehlgeschlagen</string>
     <string name="permission_required">Speicherberechtigung erforderlich</string>
+    <string name="eraser_mode">Radiergummi</string>
+    <string name="pen_mode">Stift</string>
+    <string name="adjust_pen_size">Stiftgröße anpassen</string>
+    <string name="scroll_mode">Scroll-Modus</string>
+    <string name="draw_mode">Zeichnen-Modus</string>
+    <string name="scroll_mode_enabled">Scroll-Modus aktiviert</string>
+    <string name="draw_mode_enabled">Zeichnen-Modus aktiviert</string>
 </resources>

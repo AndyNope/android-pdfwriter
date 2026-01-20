@@ -32,6 +32,10 @@ class DrawingView @JvmOverloads constructor(
             field = value
             paint.strokeWidth = value
         }
+    
+    var isEraserMode: Boolean = false
+    
+    var isScrollMode: Boolean = false // Scroll-Modus statt Zeichnen
 
     init {
         paint.color = penColor
@@ -55,6 +59,11 @@ class DrawingView @JvmOverloads constructor(
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        // Im Scroll-Modus keine Zeichnungen
+        if (isScrollMode) {
+            return false
+        }
+        
         val x = event.x
         val y = event.y
         
@@ -64,22 +73,62 @@ class DrawingView @JvmOverloads constructor(
         
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                currentPath.moveTo(x, y)
-                paint.strokeWidth = adjustedWidth
+                // Verhindere dass ScrollView das Event abfängt
+                parent?.requestDisallowInterceptTouchEvent(true)
+                
+                if (isEraserMode) {
+                    eraseAtPoint(x, y, adjustedWidth)
+                } else {
+                    currentPath.moveTo(x, y)
+                    paint.strokeWidth = adjustedWidth
+                }
                 return true
             }
             MotionEvent.ACTION_MOVE -> {
-                currentPath.lineTo(x, y)
-                paint.strokeWidth = adjustedWidth
+                if (isEraserMode) {
+                    eraseAtPoint(x, y, adjustedWidth)
+                } else {
+                    currentPath.lineTo(x, y)
+                    paint.strokeWidth = adjustedWidth
+                }
                 invalidate()
             }
-            MotionEvent.ACTION_UP -> {
-                paths.add(DrawPath(Path(currentPath), penColor, adjustedWidth))
-                currentPath.reset()
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                // Erlaube ScrollView wieder Events zu verarbeiten
+                parent?.requestDisallowInterceptTouchEvent(false)
+                
+                if (!isEraserMode) {
+                    paths.add(DrawPath(Path(currentPath), penColor, adjustedWidth))
+                    currentPath.reset()
+                }
                 invalidate()
             }
         }
-        return super.onTouchEvent(event)
+        return true
+    }
+    
+    private fun eraseAtPoint(x: Float, y: Float, eraseRadius: Float) {
+        val pathIterator = paths.iterator()
+        while (pathIterator.hasNext()) {
+            val drawPath = pathIterator.next()
+            val pathMeasure = android.graphics.PathMeasure(drawPath.path, false)
+            val pathLength = pathMeasure.length
+            val pos = FloatArray(2)
+            
+            var distance = 0f
+            while (distance < pathLength) {
+                pathMeasure.getPosTan(distance, pos, null)
+                val dx = pos[0] - x
+                val dy = pos[1] - y
+                val distanceToPoint = kotlin.math.sqrt(dx * dx + dy * dy)
+                
+                if (distanceToPoint < eraseRadius * 3) {
+                    pathIterator.remove()
+                    break
+                }
+                distance += 5f
+            }
+        }
     }
 
     fun clearDrawing() {
@@ -95,7 +144,17 @@ class DrawingView @JvmOverloads constructor(
         return bitmap
     }
 
-    private data class DrawPath(
+    fun getPathsCopy(): List<DrawPath> {
+        return paths.map { DrawPath(Path(it.path), it.color, it.width) }
+    }
+
+    fun restorePaths(pathsList: List<DrawPath>) {
+        paths.clear()
+        paths.addAll(pathsList.map { DrawPath(Path(it.path), it.color, it.width) })
+        invalidate()
+    }
+
+    data class DrawPath(
         val path: Path,
         val color: Int,
         val width: Float

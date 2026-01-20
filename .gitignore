@@ -13,3 +13,13 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Gradle
+gradle-8.2/
+gradle.zip
+gradlew
+gradlew.bat
+gradle/
+
+# Build outputs
+app/build/

@@ -44,11 +44,4 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    
-    // For PDF rendering - using JitPack repository
-    implementation("com.github.barteksc:android-pdf-viewer:3.2.0-beta.1")
-}
-
-repositories {
-    maven { url = uri("https://jitpack.io") }
 }
