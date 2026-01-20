@@ -141,6 +141,18 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         }
 
+        binding.btnUndo.setOnClickListener {
+            if (binding.drawingView.undo()) {
+                updateUndoRedoButtons()
+            }
+        }
+
+        binding.btnRedo.setOnClickListener {
+            if (binding.drawingView.redo()) {
+                updateUndoRedoButtons()
+            }
+        }
+
         binding.btnMenu.setOnClickListener { view ->
             showMenu(view)
         }
@@ -149,8 +161,17 @@ class MainActivity : AppCompatActivity() {
         binding.drawingView.penSize = 5f
         binding.drawingView.isEraserMode = false
         binding.drawingView.isScrollMode = false
+        binding.drawingView.onDrawingChanged = { updateUndoRedoButtons() }
         highlightActiveMode()
         updateScrollModeButton()
+        updateUndoRedoButtons()
+    }
+
+    private fun updateUndoRedoButtons() {
+        binding.btnUndo.isEnabled = binding.drawingView.canUndo()
+        binding.btnUndo.alpha = if (binding.drawingView.canUndo()) 1.0f else 0.3f
+        binding.btnRedo.isEnabled = binding.drawingView.canRedo()
+        binding.btnRedo.alpha = if (binding.drawingView.canRedo()) 1.0f else 0.3f
     }
 
     private fun updateScrollModeButton() {
@@ -182,6 +203,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.menu_clear_page -> {
                     binding.drawingView.clearDrawing()
+                    updateUndoRedoButtons()
                     true
                 }
                 R.id.menu_adjust_pen_size -> {
@@ -228,6 +250,7 @@ class MainActivity : AppCompatActivity() {
         pageDrawings[currentPageIndex]?.let { paths ->
             binding.drawingView.restorePaths(paths)
         }
+        updateUndoRedoButtons()
     }
 
     private fun loadPdf(uri: Uri) {

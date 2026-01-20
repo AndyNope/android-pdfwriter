@@ -13,6 +13,7 @@ class DrawingView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     private val paths = mutableListOf<DrawPath>()
+    private val undoneHistory = mutableListOf<DrawPath>()
     private var currentPath = Path()
     private val paint = Paint().apply {
         isAntiAlias = true
@@ -36,6 +37,8 @@ class DrawingView @JvmOverloads constructor(
     var isEraserMode: Boolean = false
     
     var isScrollMode: Boolean = false // Scroll-Modus statt Zeichnen
+    
+    var onDrawingChanged: (() -> Unit)? = null
 
     init {
         paint.color = penColor
@@ -100,6 +103,9 @@ class DrawingView @JvmOverloads constructor(
                 if (!isEraserMode) {
                     paths.add(DrawPath(Path(currentPath), penColor, adjustedWidth))
                     currentPath.reset()
+                    // Lösche Redo-History bei neuer Zeichnung
+                    undoneHistory.clear()
+                    onDrawingChanged?.invoke()
                 }
                 invalidate()
             }
@@ -124,6 +130,8 @@ class DrawingView @JvmOverloads constructor(
                 
                 if (distanceToPoint < eraseRadius * 3) {
                     pathIterator.remove()
+                    undoneHistory.clear()
+                    onDrawingChanged?.invoke()
                     break
                 }
                 distance += 5f
@@ -133,9 +141,30 @@ class DrawingView @JvmOverloads constructor(
 
     fun clearDrawing() {
         paths.clear()
+        undoneHistory.clear()
         currentPath.reset()
         invalidate()
     }
+
+    fun undo(): Boolean {
+        if (paths.isEmpty()) return false
+        val lastPath = paths.removeAt(paths.lastIndex)
+        undoneHistory.add(lastPath)
+        invalidate()
+        return true
+    }
+
+    fun redo(): Boolean {
+        if (undoneHistory.isEmpty()) return false
+        val redoPath = undoneHistory.removeAt(undoneHistory.lastIndex)
+        paths.add(redoPath)
+        invalidate()
+        return true
+    }
+
+    fun canUndo(): Boolean = paths.isNotEmpty()
+
+    fun canRedo(): Boolean = undoneHistory.isNotEmpty()
 
     fun getBitmap(): Bitmap {
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)

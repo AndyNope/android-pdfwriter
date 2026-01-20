@@ -76,6 +76,22 @@
             android:layout_weight="1"/>
 
         <Button
+            android:id="@+id/btnUndo"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="4dp"
+            android:text="↶"
+            android:textSize="24sp"/>
+
+        <Button
+            android:id="@+id/btnRedo"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="4dp"
+            android:text="↷"
+            android:textSize="24sp"/>
+
+        <Button
             android:id="@+id/btnPenMode"
             android:layout_width="48dp"
             android:layout_height="48dp"
